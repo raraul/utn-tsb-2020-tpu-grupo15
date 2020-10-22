@@ -28,7 +28,24 @@ public class ArchivoDeDatos {
 
     public TSB_OAHashtable procesarAgrupaciones() {
         TSB_OAHashtable tablaHash = new TSB_OAHashtable();
+        try {
+            Scanner sc = new Scanner(archivo);
+            while (sc.hasNext()) {
+                String[] campos = sc.nextLine().split("\\|");
+                if (campos[4].equals("000100000000000")) {
+                    Agrupacion agrupacion = (Agrupacion) tablaHash.get(campos[5]);
+                    int votos = Integer.parseInt(campos[6]);
+                    agrupacion.sumarVotos(votos);
+                }
+            }
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return tablaHash;
+    }
 
+    public void contarVotosPorAgrupacion(TSB_OAHashtable tablaHash) {
         try {
             Scanner sc = new Scanner(archivo);
             while (sc.hasNext()) {
@@ -38,7 +55,6 @@ public class ArchivoDeDatos {
                     tablaHash.put(agrupacion.getCodigo(), agrupacion);
                 }
             }
-            return tablaHash;
         }
         catch (IOException ex) {
             ex.printStackTrace();

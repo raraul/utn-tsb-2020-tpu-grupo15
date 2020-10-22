@@ -8,5 +8,6 @@
       <Button fx:id="btnSeleccionarOrigenDatos" layoutX="510.0" layoutY="21.0" mnemonicParsing="false" onAction="#cambiarUbicacion" text="Seleccionar" />
       <Label fx:id="lblOrigenDatos" layoutX="14.0" layoutY="25.0" text="Origen de datos" />
       <Label fx:id="lblOrigenDatosRuta" layoutX="109.0" layoutY="25.0" text="Seleccionar ubicación de los datos" />
+      <TextArea fx:id="txtAgrupaciones" layoutX="14.0" layoutY="68.0" prefHeight="300.0" prefWidth="570.0" />
    </children>
 </AnchorPane>
