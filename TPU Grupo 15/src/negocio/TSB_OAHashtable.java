@@ -264,6 +264,10 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
         //  setear el state de la casilla a Tombstone
         entry.setState(TOMBSTONE);
 
+        // Actualizamos los contadores
+        this.count--;
+        this.modCount++;
+
 
         return value;
     }
@@ -398,6 +402,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     @Override
     protected Object clone() throws CloneNotSupportedException 
     {
+
         //todo
         // HACER...
         negocio.TSB_OAHashtable<K, V> t = (negocio.TSB_OAHashtable<K, V>)super.clone();
@@ -496,9 +501,22 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     {
         //TODO
         // HACER...
+        //K key;
+        boolean encontrado =false;
+        for (int i = 0 ; i <= table.length ; i ++)
+        {
+            Entry <K,V> entradaEnTabla= (Entry) table[i];
+            V valorEnTabla= entradaEnTabla.getValue();
+            if (valorEnTabla.equals(value)){
+                //key = entradaEnTabla.getKey();
+                encontrado = true;
+                break;
+            }
+        }
+
         if(value == null) return false;
         
-        return false;
+        return encontrado ;
     }
     
     /**
