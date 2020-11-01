@@ -1,5 +1,7 @@
 package negocio;
 
+import com.sun.jdi.Value;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -181,7 +183,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      *         tabla.
      */
     @Override
-    public V get(Object key) 
+    public V get(Object key)
     {
         V value = null;
         if(key == null) throw new NullPointerException("get(): parámetro null");
@@ -216,17 +218,16 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
 
        V old = null;
        //Busca la entrada en la tabla por su key a partir de el indice ik, si existe retorna la entrada si no retorna null
-       Map.Entry<K, V> x = this.search_for_entry((K)key, ik);
-       if(x != null)    // si la entrada ya existia para esa key , devuelve y reemplaza el valor anterior por el actual.
+       Entry<K, V> x = (Entry<K, V>) this.search_for_entry((K)key, ik);
+       if(x != null )    // si la entrada ya existia para esa key , devuelve y reemplaza el valor anterior por el actual.
                         // Luego de eso finaliza el metodo devolviendo old
-       {
-           old = x.getValue();
+       {   old = x.getValue();
            x.setValue(value);
        }
        else //Si  la entrada no existia,pregunto si el nivel de carga es mayor a el factor de carga
-       {
-           if(this.load_level() >= this.load_factor) { this.rehash(); } //si lo procedo a hacer rehashing
-           int pos = search_for_OPEN(this.table, this.h(key)); // pos sera la posicion en donde guardare la nueva entrada; Busco una abierta.
+       {   if(this.load_level() >= this.load_factor) { this.rehash(); } //si si procedo a hacer rehashing
+
+           int pos = search_for_OPEN(this.table, this.h(key)); // pos sera la posicion en donde guardare la nueva entrada; Busco una abierta O UNA TOMBSTONE.
            Map.Entry<K, V> entry = new Entry<>(key, value, CLOSED); //Creo una entrada a partir de la key y el value que me dieron de parametro
                                                                     // y cierro esa casilla
            table[pos] = entry;
@@ -248,12 +249,23 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      */
     @Override
     public V remove(Object key) 
-    {
-        // TODO
-
+    {   V value;
         if(key == null) throw new NullPointerException("remove(): parámetro null");
+        //indice de la hash
+        int ik = h(key.hashCode());
 
-        return null;
+        //Uso esta clase por que la clase map no tiene definidos los metodos de la clase que la implementa
+        //y por tanto ese entry no contiene los metodos set y get State
+        // CREO YO que tódo el programa deberia ser usando esta clase , si estamos seguros que implementa map correctamente
+        TSB_OAHashtable.Entry<K,V> entry = (Entry<K, V>) search_for_entry((K) key, ik);
+
+        value= entry.getValue();
+
+        //  setear el state de la casilla a Tombstone
+        entry.setState(TOMBSTONE);
+
+
+        return value;
     }
 
     /**
@@ -386,6 +398,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     @Override
     protected Object clone() throws CloneNotSupportedException 
     {
+        //todo
         // HACER...
         negocio.TSB_OAHashtable<K, V> t = (negocio.TSB_OAHashtable<K, V>)super.clone();
 
@@ -454,6 +467,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     @Override
     public String toString() 
     {
+        //todo
         // REVISAR... Asegúrense de que funciona bien...
         StringBuilder cad = new StringBuilder("[");
         for(int i = 0; i < this.table.length; i++)
@@ -480,6 +494,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      */
     public boolean contains(Object value)
     {
+        //TODO
         // HACER...
         if(value == null) return false;
         
@@ -633,7 +648,10 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
 
             Entry<K, V> entry = (Entry<K, V>) table[ik];
             if(entry.getState() == OPEN) { return -1; }
-            if(key.equals(entry.getKey())) { return ik; }
+            // DEVUELVE LA POSICION DEL OBJETO SOLO SI ESTA OCUPADA LA CASILLA
+            // SI ESTA ABIERTA , DEVULVE EL -1 EN EL ANTERIOR IF
+            // SI ES TOMBSTONE , ESTA DADA DE BAJA LOGICAMENTE , Y POR TANTO A PESAR DE QUE LAS CLAVES COINCIDAN NO HAY QUE MOSTRAR
+            if(key.equals(entry.getKey()) || entry.getState()== CLOSED ){ return ik; }
         }
     }
 
@@ -648,8 +666,11 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             ik += (int)Math.pow(j, 2);
             ik %= t.length;
 
+
+
+            // AGREGE EN SEARCH la opcion de que te devuelva una tombstone , si no solo grabaria en abiertas y no en tombstones , llenando la tabla
             Entry<K, V> entry = (Entry<K, V>) t[ik];
-            if(entry.getState() == OPEN) { return ik; }
+            if(entry.getState() == OPEN || entry.getState() == TOMBSTONE) { return ik; }
         }
     }
 
@@ -662,7 +683,9 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      * la tabla. Lanzará una IllegalArgumentException si alguno de los dos 
      * parámetros es null.
      */
-    private class Entry<K, V> implements Map.Entry<K, V>
+
+    // EL IDE me recomendo hacer esta clase static
+    private static class Entry<K, V> implements Map.Entry<K, V>
     {
         private K key;
         private V value;
@@ -708,7 +731,10 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
         }
 
         public void setState(int ns)
-        {
+        {   //CONSTANTES DECLARADAS ARRIBA
+            // 0 = OPEN
+            // 1 = CLOSE
+            // 2 = TOMBSTONE
             if(ns >= 0 && ns < 3)
             {
                 state = ns;
