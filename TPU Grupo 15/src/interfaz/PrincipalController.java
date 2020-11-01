@@ -17,6 +17,7 @@ public class PrincipalController {
     public void cambiarUbicacion(ActionEvent actionEvent) {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setTitle("Seleccionar ubicación de los datos");
+        //Si se quiere cambiar el directorio actual, te deja elegir desde donde estas actualmente
         if (!lblOrigenDatosRuta.getText().equals("Seleccionar ubicación de los datos")) {
             dc.setInitialDirectory(new File(lblOrigenDatosRuta.getText()));
         }
@@ -29,10 +30,13 @@ public class PrincipalController {
     }
 
     public void CargarDatos() {
+
+        // Movida la creacion de los archivos a el constructor de Agrupaciones
+
 //        ArchivoDeDatos archivoAgrupaciones = new ArchivoDeDatos(lblOrigenDatosRuta.getText() + "\\descripcion_postulaciones.dsv");
 //        ArchivoDeDatos archivoRegiones = new ArchivoDeDatos(lblOrigenDatosRuta.getText() + "\\descripcion_regiones.dsv");
 //        ArchivoDeDatos archivoMesas = new ArchivoDeDatos(lblOrigenDatosRuta.getText() + "\\mesas_totales_agrp_politica.dsv");
-//
+
 //        System.out.println(archivoAgrupaciones.primeraLinea());
 //        System.out.println(archivoRegiones.primeraLinea());
 //        System.out.println(archivoMesas.primeraLinea());

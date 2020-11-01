@@ -183,10 +183,15 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     @Override
     public V get(Object key) 
     {
-        // HACER...
+        V value = null;
         if(key == null) throw new NullPointerException("get(): parámetro null");
+
+        int indice = this.h(key.hashCode()); //indice de la key que recibi en la tabla hash
+        Map.Entry<K,V> entry = this.search_for_entry((K) key,indice); // busco la entrada que corresponda con esa key a partir de el indice
+        value = entry.getValue(); // asigno el valor y lo devuelvo
+
        
-        return null;
+        return value;
     }
 
     /**
@@ -205,21 +210,25 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     public V put(K key, V value) 
     {
        if(key == null || value == null) throw new NullPointerException("put(): parámetro null");
-       
+
+       // ik es el indice en donde se supone deberia estar la clave seguns su dispersion hash
        int ik = this.h(key);
 
        V old = null;
+       //Busca la entrada en la tabla por su key a partir de el indice ik, si existe retorna la entrada si no retorna null
        Map.Entry<K, V> x = this.search_for_entry((K)key, ik);
-       if(x != null) 
+       if(x != null)    // si la entrada ya existia para esa key , devuelve y reemplaza el valor anterior por el actual.
+                        // Luego de eso finaliza el metodo devolviendo old
        {
            old = x.getValue();
            x.setValue(value);
        }
-       else
+       else //Si  la entrada no existia,pregunto si el nivel de carga es mayor a el factor de carga
        {
-           if(this.load_level() >= this.load_factor) { this.rehash(); }
-           int pos = search_for_OPEN(this.table, this.h(key));
-           Map.Entry<K, V> entry = new Entry<>(key, value, CLOSED);
+           if(this.load_level() >= this.load_factor) { this.rehash(); } //si lo procedo a hacer rehashing
+           int pos = search_for_OPEN(this.table, this.h(key)); // pos sera la posicion en donde guardare la nueva entrada; Busco una abierta.
+           Map.Entry<K, V> entry = new Entry<>(key, value, CLOSED); //Creo una entrada a partir de la key y el value que me dieron de parametro
+                                                                    // y cierro esa casilla
            table[pos] = entry;
 
            this.count++;
@@ -240,7 +249,8 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     @Override
     public V remove(Object key) 
     {
-        // HACER...
+        // TODO
+
         if(key == null) throw new NullPointerException("remove(): parámetro null");
 
         return null;
@@ -270,7 +280,9 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     @Override
     public void clear() 
     {
-        // HACER... obvio...
+        this.table = new Object[this.initial_capacity];
+        this.count = 0;
+        this.modCount = 0;
 
     }
 
