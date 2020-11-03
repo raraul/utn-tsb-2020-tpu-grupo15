@@ -490,22 +490,15 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     /**
      * Determina si alguna clave de la tabla está asociada al objeto value que
      * entra como parámetro. Equivale a containsValue().
-     * @param valueToSearchFor el objeto a buscar en la tabla.
+     * @param value el objeto a buscar en la tabla.
      * @return true si alguna clave está asociada efectivamente a ese value.
      */
-    public boolean contains(Object valueToSearchFor)
+    public boolean contains(Object value)
     {
         //TODO
         // HACER...
-        if(valueToSearchFor == null) return false;
-
-        Iterator<Map.Entry<K,V>> i = this.entrySet().iterator();
-        while(i.hasNext())
-        {
-            Map.Entry<K, V> e = i.next();
-            V value = e.getValue();
-            if(value.equals(valueToSearchFor)) { return true; }
-        }
+        if(value == null) return false;
+        
         return false;
     }
     
@@ -657,9 +650,9 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             Entry<K, V> entry = (Entry<K, V>) table[ik];
             if(entry.getState() == OPEN) { return -1; }
             // DEVUELVE LA POSICION DEL OBJETO SOLO SI ESTA OCUPADA LA CASILLA
-            // SI ESTA ABIERTA , DEVUELVE EL -1 EN EL ANTERIOR IF
+            // SI ESTA ABIERTA , DEVULVE EL -1 EN EL ANTERIOR IF
             // SI ES TOMBSTONE , ESTA DADA DE BAJA LOGICAMENTE , Y POR TANTO A PESAR DE QUE LAS CLAVES COINCIDAN NO HAY QUE MOSTRAR
-            if(key.equals(entry.getKey()) && entry.getState()== CLOSED){ return ik; }
+            if(key.equals(entry.getKey()) || entry.getState()== CLOSED ){ return ik; }
         }
     }
 
@@ -676,7 +669,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
 
 
 
-            // AGREGuE EN SEARCH la opcion de que te devuelva una tombstone , si no solo grabaria en abiertas y no en tombstones , llenando la tabla
+            // AGREGE EN SEARCH la opcion de que te devuelva una tombstone , si no solo grabaria en abiertas y no en tombstones , llenando la tabla
             Entry<K, V> entry = (Entry<K, V>) t[ik];
             if(entry.getState() == OPEN || entry.getState() == TOMBSTONE) { return ik; }
         }
@@ -785,7 +778,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      * contiene datos ella misma, sino que accede y gestiona directamente datos
      * de otra fuente), por lo que no tiene atributos y sus métodos gestionan en
      * forma directa el contenido de la tabla. Están soportados los metodos para
-     * eliminar un objeto (remove()), eliminar toodoo el contenido (clear) y la
+     * eliminar un objeto (remove()), eliminar todo el contenido (clear) y la  
      * creación de un Iterator (que incluye el método Iterator.remove()).
      */    
     private class KeySet extends AbstractSet<K> 
@@ -848,7 +841,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             @Override
             public boolean hasNext() 
             {
-                // HACER... xd
+                // HACER...
                 return true;
             }
 
@@ -858,7 +851,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             @Override
             public K next() 
             {
-                // REVISAR Y HACER... JAJAJAJA XDDDDDDDDDDDDDDD
+                // REVISAR Y HACER...
 
                 // control: fail-fast iterator...
                 if(negocio.TSB_OAHashtable.this.modCount != expected_modCount)
@@ -887,7 +880,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             @Override
             public void remove() 
             {
-                // REVISAR Y HACER... JAJAJAJA
+                // REVISAR Y HACER...
 
                 if(!next_ok) 
                 { 
