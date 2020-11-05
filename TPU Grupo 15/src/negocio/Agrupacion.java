@@ -8,6 +8,7 @@ public class Agrupacion {
     public Agrupacion(String codigo, String nombre) {
         this.codigo = codigo;
         this.nombre = nombre;
+        votos = 0;
     }
 
     public String getCodigo() {
@@ -18,16 +19,10 @@ public class Agrupacion {
         return nombre;
     }
 
-    public void sumarVotos(int votosASumar) {
-        this.votos += votosASumar;
-    }
+    public void sumarVotos(int votosASumar) { votos += votosASumar; }
 
     @Override
     public String toString() {
-        return "Agrupacion{" +
-                "codigo='" + codigo + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", votos=" + votos +
-                '}';
+        return "Agrupacion: (" + codigo + ")  |  " + nombre + "  |  Votos: " + votos;
     }
 }

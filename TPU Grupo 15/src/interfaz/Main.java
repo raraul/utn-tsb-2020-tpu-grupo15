@@ -12,7 +12,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("principal.fxml"));
         primaryStage.setTitle("Elecciones PASO 2019");
-        primaryStage.setScene(new Scene(root, 600, 300));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
