@@ -499,9 +499,6 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      */
     public boolean contains(Object valueToSearchFor)
     {
-        //TODO
-        // HACER...
-<<<<<<< HEAD
         if(valueToSearchFor == null) return false;
 
         Iterator<Map.Entry<K,V>> i = this.entrySet().iterator();
@@ -512,24 +509,8 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             if(value.equals(valueToSearchFor)) { return true; }
         }
         return false;
-=======
-        //K key;
-        boolean encontrado =false;
-        for (int i = 0 ; i <= table.length ; i ++)
-        {
-            Entry <K,V> entradaEnTabla= (Entry) table[i];
-            V valorEnTabla= entradaEnTabla.getValue();
-            if (valorEnTabla.equals(value)){
-                //key = entradaEnTabla.getKey();
-                encontrado = true;
-                break;
-            }
-        }
 
-        if(value == null) return false;
-        
-        return encontrado ;
->>>>>>> 9f28208b887b45eaf3bf9dbdf92a32ebc6941e89
+
     }
     
     /**
