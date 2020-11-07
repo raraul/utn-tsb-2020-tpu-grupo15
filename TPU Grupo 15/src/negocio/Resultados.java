@@ -3,7 +3,9 @@ package negocio;
 import soporte.ArchivoDeDatos;
 import soporte.TSBHashtable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Resultados {
     private TSBHashtable tablaHash;
@@ -22,8 +24,16 @@ public class Resultados {
     }
 
     public Collection getResultadosRegion(String codRegion) {
-        Agrupaciones a = (Agrupaciones) tablaHash.get(codRegion);
-        return a.getResultados();
+        try {
+            Agrupaciones a = (Agrupaciones) tablaHash.get(codRegion);
+            return a.getResultados();
+        }
+        catch (NullPointerException ex) {
+            System.out.println("NullPointerException");
+            ex.printStackTrace();
+            // todo
+            return new ArrayList<>();
+        }
     }
 }
 

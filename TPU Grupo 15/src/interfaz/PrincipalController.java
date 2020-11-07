@@ -46,6 +46,9 @@ public class PrincipalController {
         oblist = FXCollections.observableArrayList(resultados.getResultadosRegion("00"));
         lvwListaResultados.setItems(oblist);
         cboDistritos.setDisable(false);
+        cboCircuitos.setDisable(true);
+        cboSecciones.setDisable(true);
+        cboMesas.setDisable(true);
     }
 
     public void elegirDistrito(ActionEvent actionEvent) {
@@ -69,8 +72,12 @@ public class PrincipalController {
             oblist = FXCollections.observableArrayList(seccion.getSubregiones());
             cboCircuitos.setItems(oblist);
             cboCircuitos.setDisable(false);
+            cboMesas.setDisable(true);
 
             oblist = FXCollections.observableArrayList(resultados.getResultadosRegion(seccion.getCodigo()));
+            System.out.println("\n\n\n\n");
+            System.out.println(resultados.getResultadosRegion(seccion.getCodigo()));
+            System.out.println("\n\n\n\n");
             lvwListaResultados.setItems(oblist);
         } else
             cboCircuitos.setItems(null);
