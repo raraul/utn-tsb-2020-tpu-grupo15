@@ -29,6 +29,7 @@ public class Resultados {
             return a.getResultados();
         }
         catch (NullPointerException ex) {
+            // todo: esto hay que arreglarlo para el caso de Malvinas
             System.out.println("NullPointerException");
             ex.printStackTrace();
             // todo

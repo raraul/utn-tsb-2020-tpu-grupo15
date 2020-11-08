@@ -26,6 +26,10 @@ public class PrincipalController {
         if (!lblOrigenDatosRuta.getText().equals("Seleccionar ubicación de los datos")) {
             dc.setInitialDirectory(new File(lblOrigenDatosRuta.getText()));
         }
+        else {
+            // Abrimos la ventana en el directorio actual
+            dc.setInitialDirectory(new File(System.getProperty("user.dir")));
+        }
 
         File carpetaOrigenDatos = dc.showDialog(null);
         if (carpetaOrigenDatos != null) {

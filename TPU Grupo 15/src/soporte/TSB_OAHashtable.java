@@ -157,7 +157,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
     @Override
     public boolean containsKey(Object key) throws NullPointerException
     {
-        return (this.get((K)key) != null);
+        return (this.get((K) key) != null);
     }
 
     /**
@@ -190,8 +190,9 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
 
         int indice = this.h(key.hashCode()); //indice de la key que recibi en la tabla hash
         Map.Entry<K,V> entry = this.search_for_entry((K) key,indice); // busco la entrada que corresponda con esa key a partir de el indice
-        value = entry.getValue(); // asigno el valor y lo devuelvo
-
+        if (entry != null) {
+            value = entry.getValue(); // asigno el valor y lo devuelvo
+        }
        
         return value;
     }
@@ -250,26 +251,22 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      */
     @Override
     public V remove(Object key) throws NullPointerException
-    {   V value;
+    {   V value= null;
         if(key == null) throw new NullPointerException("remove(): parámetro null");
         //indice de la hash
         int ik = h(key.hashCode());
 
-        //Uso esta clase por que la clase map no tiene definidos los metodos de la clase que la implementa
-        //y por tanto ese entry no contiene los metodos set y get State
-        // CREO YO que tódo el programa deberia ser usando esta clase , si estamos seguros que implementa map correctamente
-        TSB_OAHashtable.Entry<K,V> entry = (Entry<K, V>) search_for_entry((K) key, ik);
+        ik= search_for_index((K) key,ik);
+        if (ik>= 0){
+            Entry<K,V>entry= (Entry) table[ik];
+            value= entry.getValue();
+            //  setear el state de la casilla a Tombstone
+            entry.setState(TOMBSTONE);
+            // Actualizamos los contadores
+            this.count--;
+            this.modCount++;
 
-        value= entry.getValue();
-
-        //  setear el state de la casilla a Tombstone
-        entry.setState(TOMBSTONE);
-
-        // Actualizamos los contadores
-        this.count--;
-        this.modCount++;
-
-
+        }
         return value;
     }
 
@@ -502,11 +499,14 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
         if(valueToSearchFor == null) return false;
 
         Iterator<Map.Entry<K,V>> i = this.entrySet().iterator();
-        while(i.hasNext())
-        {
+        while(i.hasNext()) {
             Map.Entry<K, V> e = i.next();
             V value = e.getValue();
-            if(value.equals(valueToSearchFor)) { return true; }
+            if (value != null) {
+                if (value.equals(valueToSearchFor)) {
+                    return true;
+                }
+            }
         }
         return false;
 
@@ -653,18 +653,16 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
      */
     private int search_for_index(K key, int ik)
     {
-        for(int j=0; ;j++)
+        for(int j=0;j<=size() ;j++)
         {
             ik += (int)Math.pow(j, 2);
             ik %= table.length;
 
             Entry<K, V> entry = (Entry<K, V>) table[ik];
             if(entry.getState() == OPEN) { return -1; }
-            // DEVUELVE LA POSICION DEL OBJETO SOLO SI ESTA OCUPADA LA CASILLA
-            // SI ESTA ABIERTA , DEVUELVE EL -1 EN EL ANTERIOR IF
-            // SI ES TOMBSTONE , ESTA DADA DE BAJA LOGICAMENTE , Y POR TANTO A PESAR DE QUE LAS CLAVES COINCIDAN NO HAY QUE MOSTRAR
-            if(key.equals(entry.getKey()) && entry.getState()== CLOSED){ return ik; }
+            if(key.equals(entry.getKey())) { return ik; }
         }
+        return -1;
     }
 
     /*
@@ -844,7 +842,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
              */
             public KeySetIterator()
             {
-                actual = 0;
+                actual = -1;
                 next_ok = false;
                 expected_modCount = TSB_OAHashtable.this.modCount;
 
@@ -860,7 +858,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
                 Object t[] = TSB_OAHashtable.this.table;
                 //Pregunto si la tabla esta vacia , si lo esta retorno false
                 if (TSB_OAHashtable.this.isEmpty()){return false;}
-                if(actual >= t.length) { return false; }
+                if(actual >= t.length -1 ) { return false; }
 
     // MAL
                 //Pregunto si el estado de la siguiente entrada es Abierto
@@ -1015,7 +1013,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
              */
             public EntrySetIterator()
             {
-                actual = 0;
+                actual = -1;
                 next_ok = false;
                 expected_modCount =TSB_OAHashtable.this.modCount;
             }
@@ -1029,7 +1027,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             {
                 Object t[] = TSB_OAHashtable.this.table;
                 if (TSB_OAHashtable.this.isEmpty()){return false;}
-                if(actual >= t.length) { return false; }
+                if(actual >= t.length -1) { return false; }
                 return true;
 
             }
@@ -1040,6 +1038,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             @Override
             public Map.Entry<K, V> next() 
             {
+                Object t[] = TSB_OAHashtable.this.table;
                 //HACER...
 
                 // control: fail-fast iterator...
@@ -1056,7 +1055,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
 
                 // avisar que next() fue invocado con éxito...
                 next_ok = true;
-                Object t[] = TSB_OAHashtable.this.table;
+
 
                 actual ++;
                 nextEntry= (Entry<K, V>) t[actual];
@@ -1150,7 +1149,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             public ValueCollectionIterator()
             {
                 // HACER...
-                actual = 0;
+                actual = -1;
                 next_ok = false;
                 expected_modCount = TSB_OAHashtable.this.modCount;
             }
@@ -1166,7 +1165,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
                 Object t[] = TSB_OAHashtable.this.table;
                 //Pregunto si la tabla esta vacia , si lo esta retorno false
                 if (TSB_OAHashtable.this.isEmpty()){return false;}
-                if(actual >= t.length) { return false; }
+                if(actual >= t.length -1) { return false; }
 
                 return true;
             }
