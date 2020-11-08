@@ -179,7 +179,6 @@ public final class BaseDeDatos {
         Region pais = new Region("00","Argentina");
         Region distrito, seccion;
         ResultSet rs;
-        // todo
 
         Connection c = obtenerConexionDb();
         Statement stmt;
@@ -242,7 +241,6 @@ public final class BaseDeDatos {
         Region pais = new Region("00","Argentina");
         Region distrito, seccion;
         ResultSet rs;
-        // todo
 
         Connection c = obtenerConexionDb();
         Statement stmt;
@@ -288,7 +286,61 @@ public final class BaseDeDatos {
         return pais;
     }
 
-    public void contarVotosPorRegion(Resultados resultados, Region pais) {
+    public static void contarVotosPorRegion(Resultados resultados, Region pais) throws SQLException, ClassNotFoundException {
+        int votos;
+        // String linea = "", campos[];
+        Region distrito, seccion, circuito;
 
+        ResultSet rs;
+
+        Connection c = obtenerConexionDb();
+        Statement stmt;
+        System.out.println("Conexión a la DB abierta.");
+        stmt = c.createStatement();
+
+        // Obtenemos los votos
+        rs = stmt.executeQuery( "SELECT V.votos AS 'Votos', " +
+                "A.codigo AS 'CodigoAgrupacion', " +
+                "M.codigo AS 'CodigoMesa', " +
+                "C.codigo AS 'CodigoCircuito', " +
+                "S.codigo AS 'CodigoSeccion', " +
+                "D.codigo AS 'CodigoDistrito' " +
+                "FROM Votos V " +
+                "JOIN Agrupaciones A ON V.id_agrupacion=A.id " +
+                "JOIN Mesas M ON V.id_mesa=M.id " +
+                "JOIN Circuitos C ON C.id=M.circuito " +
+                "JOIN Secciones S ON S.id=C.seccion " +
+                "JOIN Distritos D ON D.id=S.distrito;");
+        while ( rs.next() ) {
+            String codigoAgrupacion = rs.getString("CodigoAgrupacion");
+            String codigoMesa = rs.getString("CodigoMesa");
+            String codigoCircuito = rs.getString("CodigoCircuito");
+            String codigoSeccion = rs.getString("CodigoSeccion");
+            String codigoDistrito = rs.getString("CodigoDistrito");
+            votos = rs.getInt("Votos");
+
+            resultados.sumarVotos("00", codigoAgrupacion, votos); // Votos de toda la Argentina
+
+            // Sumar votos a distrito
+            resultados.sumarVotos(codigoDistrito, codigoAgrupacion, votos);
+
+            // Sumar votos a sección
+            resultados.sumarVotos(codigoSeccion, codigoAgrupacion, votos);
+
+            // Sumar votos a circuito
+            resultados.sumarVotos(codigoCircuito, codigoAgrupacion, votos);
+
+            // Sumar votos a mesa
+            resultados.sumarVotos(codigoMesa, codigoAgrupacion, votos);
+
+            // Para mostrar las mesas
+            distrito = pais.getSubregion(codigoDistrito);
+            seccion = distrito.getSubregion(codigoSeccion);
+            circuito = seccion.getSubregion(codigoCircuito);
+            circuito.agregarSubregion(new Region(codigoMesa, codigoMesa));
+        }
+        stmt.close();
+        c.close();
+        System.out.println("Conexión a la DB cerrada.");
     }
 }

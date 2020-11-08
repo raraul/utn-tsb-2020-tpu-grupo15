@@ -95,15 +95,16 @@ public class PrincipalController implements Initializable {
             if (usarDb) {
                 Agrupaciones.leerAgrupaciones();
                 regiones = new Regiones();
+                resultados = new Resultados(regiones.getPais());
             } else {
                 Agrupaciones.leerAgrupaciones(lblOrigenDatosRuta.getText());
                 regiones = new Regiones(lblOrigenDatosRuta.getText());
+                resultados = new Resultados(lblOrigenDatosRuta.getText(), regiones.getPais());
             }
 
             oblist = FXCollections.observableArrayList(regiones.getDistritos());
             cboDistritos.setItems(oblist);
 
-            resultados = new Resultados(lblOrigenDatosRuta.getText(), regiones.getPais());
             oblist = FXCollections.observableArrayList(resultados.getResultadosRegion("00"));
             lvwListaResultados.setItems(oblist);
             cboDistritos.setDisable(false);

@@ -91,9 +91,16 @@ public class ArchivoDeDatos {
             while (sc.hasNext()) {
                 linea = sc.nextLine();
                 campos = linea.split("\\|");
+                // campos[0] = CODIGO_DISTRITO
+                // campos[1] = CODIGO_SECCION
+                // campos[2] = CODIGO_CIRCUITO
+                // campos[3] = CODIGO_MESA
+                // campos[4] = CODIGO_CATEGORIA
+                // campos[5] = CODIGO_AGRUPACION
+                // campos[6] = VOTOS_AGRUPACION
                 if (campos[4].equals("000100000000000")) {
                     votos = Integer.parseInt(campos[6]);
-                    resultados.sumarVotos("00", campos[5], votos); //Votos de toda la Argentina
+                    resultados.sumarVotos("00", campos[5], votos); // Votos de toda la Argentina
                     for (int i = 0; i < 4; i++) {
                         resultados.sumarVotos(campos[i], campos[5], votos);
                     }

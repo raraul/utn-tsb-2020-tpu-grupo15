@@ -1,6 +1,7 @@
 package negocio;
 
 import soporte.ArchivoDeDatos;
+import soporte.BaseDeDatos;
 import soporte.TSB_OAHashtable;
 
 import java.util.ArrayList;
@@ -14,6 +15,11 @@ public class Resultados {
         tablaHash = new TSB_OAHashtable();
         ArchivoDeDatos archivoMesas = new ArchivoDeDatos(path + "\\mesas_totales_agrp_politica.dsv");
         archivoMesas.contarVotosPorRegion(this, pais);
+    }
+
+    public Resultados(Region pais) {
+        tablaHash = new TSB_OAHashtable();
+        BaseDeDatos.contarVotosPorRegion(this, pais);
     }
 
     public void sumarVotos(String codRegion, String codAgrupacion, int votos) {
