@@ -28,8 +28,8 @@ public class ArchivoDeDatos {
      */
 
     //mismo proceso que contar votos por agrupacion , con nombre corregido
-    public TSBHashtable identificarAgrupacion() {
-        TSBHashtable tablaHash = new TSBHashtable(10);
+    public TSB_OAHashtable identificarAgrupacion() {
+        TSB_OAHashtable tablaHash = new TSB_OAHashtable(10);
         try {
             Scanner sc = new Scanner(archivo);
             while (sc.hasNext()) {
@@ -128,7 +128,7 @@ public class ArchivoDeDatos {
     //    return primeraLinea;
     //}
 
-    //public void contarVotosPorAgrupacion(TSBHashtable tablaHash) {
+    //public void contarVotosPorAgrupacion( tablaHash) {
     //    int votos;
     //    try {
     //        Scanner sc = new Scanner(archivo);
@@ -151,8 +151,8 @@ public class ArchivoDeDatos {
     // *Procesa la
     // * @return tablaHash devuelve la tabla con
     // */
-    //public TSBHashtable procesarAgrupaciones() {
-    //    TSBHashtable tablaHash = new TSBHashtable();
+    //public  procesarAgrupaciones() {
+    //     tablaHash = new ();
     //    try {
     //        Scanner sc = new Scanner(archivo);
     //        while (sc.hasNext()) {
@@ -174,7 +174,7 @@ public class ArchivoDeDatos {
     //
     ////A esto la profe le llama Identificar Agrupacion
     //
-    //public void contarVotosPorAgrupacion(TSBHashtable tablaHash) {
+    //public void contarVotosPorAgrupacion( tablaHash) {
     //    int votos;
     //    Agrupacion agrupacion;
     //    try {

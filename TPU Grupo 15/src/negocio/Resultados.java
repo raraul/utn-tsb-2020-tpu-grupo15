@@ -1,17 +1,17 @@
 package negocio;
 
 import soporte.ArchivoDeDatos;
-import soporte.TSBHashtable;
+import soporte.TSB_OAHashtable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class Resultados {
-    private TSBHashtable tablaHash;
+    private TSB_OAHashtable tablaHash;
 
     public Resultados(String path, Region pais) {
-        tablaHash = new TSBHashtable();
+        tablaHash = new TSB_OAHashtable();
         ArchivoDeDatos archivoMesas = new ArchivoDeDatos(path + "\\mesas_totales_agrp_politica.dsv");
         archivoMesas.contarVotosPorRegion(this, pais);
     }

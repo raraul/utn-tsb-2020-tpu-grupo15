@@ -4,11 +4,11 @@ import soporte.*;
 import java.util.Collection;
 
 public class Agrupaciones {
-    private static TSBHashtable tablaHashInicial;
-    private TSBHashtable tablaHashConteo;
+    private static TSB_OAHashtable tablaHashInicial;
+    private TSB_OAHashtable tablaHashConteo;
 
     public Agrupaciones() {
-        tablaHashConteo = new TSBHashtable();
+        tablaHashConteo = new TSB_OAHashtable();
         for (Object o: tablaHashInicial.values()) {
             Agrupacion a = (Agrupacion) o;
             tablaHashConteo.put(a.getCodigo(), new Agrupacion(a.getCodigo(),a.getNombre()));

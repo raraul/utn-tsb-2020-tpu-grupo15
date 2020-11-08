@@ -6,12 +6,12 @@ import java.util.Collection;
 public class Region {
     private String codigo;
     private String nombre;
-    private TSBHashtable subregiones;
+    private TSB_OAHashtable subregiones;
 
     public Region(String codigo, String nombre) {
         this.codigo = codigo;
         this.nombre = nombre;
-        subregiones = new TSBHashtable();
+        subregiones = new TSB_OAHashtable();
     }
 
     public void agregarSubregion(Region region) {
