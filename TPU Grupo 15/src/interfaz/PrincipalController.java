@@ -3,25 +3,45 @@ package interfaz;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import negocio.Agrupaciones;
 import negocio.Region;
 import negocio.Regiones;
 import negocio.Resultados;
+import org.junit.jupiter.api.parallel.Resources;
+import soporte.BaseDeDatos;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
-public class PrincipalController {
+public class PrincipalController implements Initializable {
     public Label lblOrigenDatosRuta;
     public ListView lvwListaResultados;
     public ComboBox cboDistritos, cboSecciones, cboCircuitos, cboMesas;
     public Resultados resultados;
-    //    private Dialog<Object> alert;
+    public boolean usarDb = false;
+    public Button btnGuardarEnDb;
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (BaseDeDatos.existeArchivoDB()) {
+            String mensajeAlerta = "Se ha detectado un archivo de base de datos.\n¿Desea cargarlo?";
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, mensajeAlerta, ButtonType.YES, ButtonType.NO);
+            alert.setTitle("¿Cargar archivo DB?");
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.CANCEL) {
+                usarDb = true;
+            }
+        }
+    }
 
     public void cambiarUbicacion(ActionEvent actionEvent) {
         DirectoryChooser dc = new DirectoryChooser();
@@ -51,24 +71,33 @@ public class PrincipalController {
     }
 
     public void cargarDatos() {
+        String mensajeAlerta = "La carga de datos y su procesamiento pueden demorar y consumir recursos de su PC." +
+                "\n¿Desea continuar?";
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, mensajeAlerta, ButtonType.YES, ButtonType.CANCEL);
+        alert.setTitle("Confirmar carga");
+        // Shows the dialog but does not wait for a user response
+        // (in other words, this brings up a non-blocking dialog).
+        // Se tilda antes de llegar a mostrarse a veces jaja
+        // alert.show();
+        alert.showAndWait();
+        // alertResponse = alert.getResult();
+        if (alert.getResult() == ButtonType.CANCEL) {
+            ArrayList<String> listaEspera = new ArrayList<>();
+            // listaEspera.add("");
+            ObservableList oblistEspera = FXCollections.observableArrayList(listaEspera);
+            lvwListaResultados.setItems(oblistEspera);
+            return;
+        }
+
         ObservableList oblist;
         try {
-            Agrupaciones.leerAgrupaciones(lblOrigenDatosRuta.getText());
-            Regiones regiones = new Regiones(lblOrigenDatosRuta.getText());
-            String mensajeAlerta = "La carga de datos y su procesamiento pueden demorar y consumir recursos de su PC." +
-                    "\n¿Desea continuar?";
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, mensajeAlerta, ButtonType.YES, ButtonType.CANCEL);
-            // Shows the dialog but does not wait for a user response (in other words, this brings up a non-blocking dialog).
-            // Se tilda antes de llegar a mostrarse a veces jaja
-            // alert.show();
-            alert.showAndWait();
-//            alertResponse = alert.getResult();
-            if (alert.getResult() == ButtonType.CANCEL) {
-                ArrayList<String> listaEspera = new ArrayList<>();
-//                listaEspera.add("");
-                ObservableList oblistEspera = FXCollections.observableArrayList(listaEspera);
-                lvwListaResultados.setItems(oblistEspera);
-                return;
+            Regiones regiones;
+            if (usarDb) {
+                Agrupaciones.leerAgrupaciones();
+                regiones = new Regiones();
+            } else {
+                Agrupaciones.leerAgrupaciones(lblOrigenDatosRuta.getText());
+                regiones = new Regiones(lblOrigenDatosRuta.getText());
             }
 
             oblist = FXCollections.observableArrayList(regiones.getDistritos());
@@ -84,17 +113,24 @@ public class PrincipalController {
             listaEspera.add("Asegúrese de haber seleccionado correctamente el directorio.");
             ObservableList oblistEspera = FXCollections.observableArrayList(listaEspera);
             lvwListaResultados.setItems(oblistEspera);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "No se pudieron leer los archivos.\nAsegúrese de haber seleccionado correctamente el directorio.", ButtonType.OK);
+
+            alert = new Alert(Alert.AlertType.ERROR, "No se pudieron leer los archivos.\nAsegúrese de haber seleccionado correctamente el directorio.", ButtonType.OK);
+            alert.setTitle("Error en la lectura");
             alert.showAndWait();
+
             cboDistritos.setDisable(true);
-//            Optional<Optional> result = alert.showAndWait();
-//            if (result.isPresent() && result.get() == ButtonType.OK) {
-//                formatSystem();
-//            }
+        } catch (SQLException | ClassNotFoundException e) {
+            alert = new Alert(Alert.AlertType.ERROR,
+                    "No se pudieron leer los datos desde la base de datos." +
+                            "\nAsegúrese de que exista y esté correcto el archivo de soporte de la base de datos.",
+                    ButtonType.OK);
+            alert.setTitle("Error en la conexión con la DB");
+            alert.showAndWait();
         }
         cboCircuitos.setDisable(true);
         cboSecciones.setDisable(true);
         cboMesas.setDisable(true);
+        btnGuardarEnDb.setDisable(false);
     }
 
     public void elegirDistrito(ActionEvent actionEvent) {
@@ -110,7 +146,6 @@ public class PrincipalController {
         lvwListaResultados.setItems(oblist);
     }
 
-    //TODO corregir validacion para circuitos cuando se reutiliza secciones/circuitos/etc
     public void elegirSeccion(ActionEvent actionEvent) {
         ObservableList oblist;
         if (cboSecciones.getValue() != null) {
@@ -121,9 +156,6 @@ public class PrincipalController {
             cboMesas.setDisable(true);
 
             oblist = FXCollections.observableArrayList(resultados.getResultadosRegion(seccion.getCodigo()));
-            System.out.println("\n\n\n\n");
-            System.out.println(resultados.getResultadosRegion(seccion.getCodigo()));
-            System.out.println("\n\n\n\n");
             lvwListaResultados.setItems(oblist);
         } else
             cboCircuitos.setItems(null);
@@ -153,17 +185,17 @@ public class PrincipalController {
         }
     }
 
-    //public void cargarDatos() {
-    //
-    //    // Movida la creacion de los archivos a el constructor de Agrupaciones
-    //
-    //    //ArchivoDeDatos archivoAgrupaciones = new ArchivoDeDatos(lblOrigenDatosRuta.getText() + "\\descripcion_postulaciones.dsv");
-    //    //ArchivoDeDatos archivoRegiones = new ArchivoDeDatos(lblOrigenDatosRuta.getText() + "\\descripcion_regiones.dsv");
-    //    //ArchivoDeDatos archivoMesas = new ArchivoDeDatos(lblOrigenDatosRuta.getText() + "\\mesas_totales_agrp_politica.dsv");
-    //
-    //    //System.out.println(archivoAgrupaciones.primeraLinea());
-    //    //System.out.println(archivoRegiones.primeraLinea());
-    //    //System.out.println(archivoMesas.primeraLinea());
-    //
-    //}
+
+    public void guardarEnDb(ActionEvent actionEvent) {
+        // todo
+
+        // Informamos al usuario el guardado exitoso
+        String mensajeAlerta = "Se han guardado exitosamente los datos en la base de datos.";
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, mensajeAlerta, ButtonType.OK);
+        alert.setTitle("Guardado exitoso");
+        alert.showAndWait();
+
+        // Se acaba de hacer el guardado, deshabilitamos el botón
+        btnGuardarEnDb.setDisable(true);
+    }
 }

@@ -1,8 +1,10 @@
 package negocio;
 
 import soporte.ArchivoDeDatos;
+import soporte.BaseDeDatos;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 public class Regiones {
@@ -15,6 +17,12 @@ public class Regiones {
         //archivoMesas = new ArchivoDeDatos(path + "\\mesas_totales_agrp_politica.dsv");
         pais = archivoRegiones.identificarRegiones();
         //archivoMesas.contarVotosPorAgrupacion(tablaHash);
+    }
+
+    public Regiones() throws SQLException, ClassNotFoundException {
+        archivoRegiones = null;
+        // todo
+        pais = BaseDeDatos.identificarRegiones();
     }
 
     public Collection getDistritos() {

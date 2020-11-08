@@ -3,6 +3,7 @@ package negocio;
 import soporte.*;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 public class Agrupaciones {
@@ -11,25 +12,27 @@ public class Agrupaciones {
 
     public Agrupaciones() {
         tablaHashConteo = new TSB_OAHashtable();
-        for (Object o: tablaHashInicial.values()) {
+        for (Object o : tablaHashInicial.values()) {
             Agrupacion a = (Agrupacion) o;
-            tablaHashConteo.put(a.getCodigo(), new Agrupacion(a.getCodigo(),a.getNombre()));
+            tablaHashConteo.put(a.getCodigo(), new Agrupacion(a.getCodigo(), a.getNombre()));
         }
     }
 
-    public static void leerAgrupaciones(String path) throws FileNotFoundException
-    {
+    public static void leerAgrupaciones(String path) throws FileNotFoundException {
         ArchivoDeDatos archivoAgrupaciones = new ArchivoDeDatos(path + "\\descripcion_postulaciones.dsv");
         tablaHashInicial = archivoAgrupaciones.identificarAgrupacion();
     }
 
-    public static void leerAgrupaciones()
-    {
-//        tablaHashInicial = lectorDB.identificarAgrupacion();
+    public static void leerAgrupaciones() {
+        try {
+            tablaHashInicial = BaseDeDatos.identificarAgrupacion();
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error al intentar hacer conexión con la base de datos.");
+            e.printStackTrace();
+        }
     }
 
-    public Agrupacion getAgrupacion(String codAgrupacion)
-    {
+    public Agrupacion getAgrupacion(String codAgrupacion) {
         return (Agrupacion) tablaHashConteo.get(codAgrupacion);
     }
 
