@@ -1,7 +1,8 @@
-package soporte;
+package test.java.soporte;
 
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
+import soporte.TSB_OAHashtable;
 
 import static org.junit.jupiter.api.Assertions.*;
 

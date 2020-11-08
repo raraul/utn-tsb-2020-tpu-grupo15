@@ -1,6 +1,8 @@
 package negocio;
 
 import soporte.*;
+
+import java.io.FileNotFoundException;
 import java.util.Collection;
 
 public class Agrupaciones {
@@ -15,7 +17,7 @@ public class Agrupaciones {
         }
     }
 
-    public static void leerAgrupaciones(String path)
+    public static void leerAgrupaciones(String path) throws FileNotFoundException
     {
         ArchivoDeDatos archivoAgrupaciones = new ArchivoDeDatos(path + "\\descripcion_postulaciones.dsv");
         tablaHashInicial = archivoAgrupaciones.identificarAgrupacion();

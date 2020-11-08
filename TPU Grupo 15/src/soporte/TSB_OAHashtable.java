@@ -825,7 +825,8 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
         private class KeySetIterator implements Iterator<K>
         {
             // TODO REVISAR y HACER... Agregar los atributos que necesiten...
-            //Punteros que me indicaran el actual y el siguiente entry 
+            //Punteros que me indicaran el actual y el siguiente entry
+            private int siguiente;
             private  int actual;
             private int anterior;
             Entry<K,V> nextEntry;
@@ -842,6 +843,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
              */
             public KeySetIterator()
             {
+                siguiente = 0;
                 actual = -1;
                 next_ok = false;
                 expected_modCount = TSB_OAHashtable.this.modCount;
@@ -854,21 +856,17 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
              */
             @Override
             public boolean hasNext() 
-            {// variable auxiliar t para simplificar accesos...
+            {
+                siguiente = actual + 1;
+                // variable auxiliar t para simplificar accesos...
                 Object t[] = TSB_OAHashtable.this.table;
                 //Pregunto si la tabla esta vacia , si lo esta retorno false
                 if (TSB_OAHashtable.this.isEmpty()){return false;}
-                if(actual >= t.length -1 ) { return false; }
-
-    // MAL
-                //Pregunto si el estado de la siguiente entrada es Abierto
-                        // Podria usar el search for open , pero lo cambie para que de True con tombstones
-                        // creo que seria if search for open == actual +1
-//                //TODO Checkear si al cast hay que asignarle o no Generics
-//                Entry<K,V> nextEntry = (Entry) t[actual+1];
-//                if (nextEntry.getState() == OPEN ){return false;}
-
-
+                if(actual >= t.length -1) { return false; }
+                while (((Entry<K, V>) t[siguiente]).getState() != CLOSED) {
+                    if(siguiente >= t.length -1) { return false; }
+                    siguiente++;
+                }
                 return true;
             }
 
@@ -892,9 +890,12 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
                 // avisar que next() fue invocado con éxito...
                 next_ok = true;
 
-                 Object t[] = TSB_OAHashtable.this.table;
+                Object t[] = TSB_OAHashtable.this.table;
 
-                actual ++;
+                actual++;
+                while (((Entry<K, V>) t[actual]).getState() != CLOSED) {
+                    actual++;
+                }
                 nextEntry= (Entry<K, V>) t[actual];
                 // y retornar la clave del elemento alcanzado...
                 return nextEntry.getKey();
@@ -997,7 +998,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
         
         private class EntrySetIterator implements Iterator<Map.Entry<K, V>>
         {
-
+            private int siguiente;
             private  int actual;
             // private int anterior; No lo estaria usando por que el remove no necesita re-apuntar
             Entry<K,V> nextEntry;
@@ -1013,6 +1014,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
              */
             public EntrySetIterator()
             {
+                siguiente =0;
                 actual = -1;
                 next_ok = false;
                 expected_modCount =TSB_OAHashtable.this.modCount;
@@ -1025,11 +1027,17 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             @Override
             public boolean hasNext() 
             {
+                siguiente = actual + 1;
+                // variable auxiliar t para simplificar accesos...
                 Object t[] = TSB_OAHashtable.this.table;
+                //Pregunto si la tabla esta vacia , si lo esta retorno false
                 if (TSB_OAHashtable.this.isEmpty()){return false;}
                 if(actual >= t.length -1) { return false; }
+                while (((Entry<K, V>) t[siguiente]).getState() != CLOSED) {
+                    if(siguiente >= t.length -1) { return false; }
+                    siguiente++;
+                }
                 return true;
-
             }
 
             /*
@@ -1056,8 +1064,10 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
                 // avisar que next() fue invocado con éxito...
                 next_ok = true;
 
-
-                actual ++;
+                actual++;
+                while (((Entry<K, V>) t[actual]).getState() != CLOSED) {
+                    actual++;
+                }
                 nextEntry= (Entry<K, V>) t[actual];
                 
                 // y retornar el elemento alcanzado...
@@ -1135,6 +1145,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             // REVISAR y HACER... Agregar los atributos que necesiten...
             private  int actual;
             private int anterior;
+            private int siguiente;
             Entry<K,V> nextEntry;
             // flag para controlar si remove() está bien invocado...
             private boolean next_ok;
@@ -1150,6 +1161,7 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
             {
                 // HACER...
                 actual = -1;
+                siguiente = 0;
                 next_ok = false;
                 expected_modCount = TSB_OAHashtable.this.modCount;
             }
@@ -1159,14 +1171,18 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
              * sido retornado por next(). 
              */
             @Override
-            public boolean hasNext() 
+            public boolean hasNext()
             {
+                siguiente = actual + 1;
                 // variable auxiliar t para simplificar accesos...
                 Object t[] = TSB_OAHashtable.this.table;
                 //Pregunto si la tabla esta vacia , si lo esta retorno false
                 if (TSB_OAHashtable.this.isEmpty()){return false;}
                 if(actual >= t.length -1) { return false; }
-
+                while (((Entry<K, V>) t[siguiente]).getState() != CLOSED) {
+                    if(siguiente >= t.length -1) { return false; }
+                    siguiente++;
+                }
                 return true;
             }
 
@@ -1174,10 +1190,8 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
              * Retorna el siguiente elemento disponible en la tabla.
              */
             @Override
-            public V next() 
+            public V next()
             {
-                // HACER...
-
                 // control: fail-fast iterator...
                 if(TSB_OAHashtable.this.modCount != expected_modCount)
                 {    
@@ -1195,7 +1209,10 @@ public class TSB_OAHashtable<K,V> implements Map<K,V>, Cloneable, Serializable
 
                 Object t[] = TSB_OAHashtable.this.table;
 
-                actual ++;
+                actual++;
+                while (((Entry<K, V>) t[actual]).getState() != CLOSED) {
+                    actual++;
+                }
                 nextEntry= (Entry<K, V>) t[actual];
                 
                 // y retornar la clave del elemento alcanzado...

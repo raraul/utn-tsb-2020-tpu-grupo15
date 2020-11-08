@@ -33,7 +33,10 @@ public class Resultados {
             System.out.println("NullPointerException");
             ex.printStackTrace();
             // todo
-            return new ArrayList<>();
+            ArrayList<String> listaVacia = new ArrayList<>();
+//            listaVacia.add("Las Malvinas son argentinas.");
+            listaVacia.add("No se registraron votos.");
+            return listaVacia;
         }
     }
 }

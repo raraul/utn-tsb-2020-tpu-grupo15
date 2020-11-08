@@ -28,7 +28,8 @@ public class ArchivoDeDatos {
      */
 
     //mismo proceso que contar votos por agrupacion , con nombre corregido
-    public TSB_OAHashtable identificarAgrupacion() {
+    public TSB_OAHashtable identificarAgrupacion() throws FileNotFoundException
+    {
         TSB_OAHashtable tablaHash = new TSB_OAHashtable(10);
         try {
             Scanner sc = new Scanner(archivo);
@@ -42,11 +43,13 @@ public class ArchivoDeDatos {
         }
         catch (FileNotFoundException e) {
             System.out.println("No se pudo leer el archivo");
+            throw e;
         }
         return tablaHash;
     }
 
-    public Region identificarRegiones() {
+    public Region identificarRegiones() throws FileNotFoundException
+    {
         Region pais = new Region("00","Argentina");
         Region distrito, seccion;
         String codigo, nombre, campos[];
@@ -80,6 +83,7 @@ public class ArchivoDeDatos {
         }
         catch (FileNotFoundException e) {
             System.out.println("No se pudo leer el archivo");
+            throw e;
         }
         return pais;
     }

@@ -11,12 +11,16 @@ import negocio.Regiones;
 import negocio.Resultados;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Optional;
 
 public class PrincipalController {
     public Label lblOrigenDatosRuta;
     public ListView lvwListaResultados;
     public ComboBox cboDistritos, cboSecciones, cboCircuitos, cboMesas;
     public Resultados resultados;
+    //    private Dialog<Object> alert;
 
 
     public void cambiarUbicacion(ActionEvent actionEvent) {
@@ -25,8 +29,7 @@ public class PrincipalController {
         //Si se quiere cambiar el directorio actual, te deja elegir desde donde estas actualmente
         if (!lblOrigenDatosRuta.getText().equals("Seleccionar ubicación de los datos")) {
             dc.setInitialDirectory(new File(lblOrigenDatosRuta.getText()));
-        }
-        else {
+        } else {
             // Abrimos la ventana en el directorio actual
             dc.setInitialDirectory(new File(System.getProperty("user.dir")));
         }
@@ -34,22 +37,61 @@ public class PrincipalController {
         File carpetaOrigenDatos = dc.showDialog(null);
         if (carpetaOrigenDatos != null) {
             lblOrigenDatosRuta.setText(carpetaOrigenDatos.getPath());
-            cargarDatos();
+//            cargarDatos();
+            mostrarMensajeEspera();
         }
+    }
+
+    public void mostrarMensajeEspera() {
+        ArrayList<String> listaEspera = new ArrayList<>();
+        listaEspera.add("Cargando votos... espere por favor.");
+        ObservableList oblistEspera = FXCollections.observableArrayList(listaEspera);
+        lvwListaResultados.setItems(oblistEspera);
+        cargarDatos();
     }
 
     public void cargarDatos() {
         ObservableList oblist;
-        Agrupaciones.leerAgrupaciones(lblOrigenDatosRuta.getText());
+        try {
+            Agrupaciones.leerAgrupaciones(lblOrigenDatosRuta.getText());
+            Regiones regiones = new Regiones(lblOrigenDatosRuta.getText());
+            String mensajeAlerta = "La carga de datos y su procesamiento pueden demorar y consumir recursos de su PC." +
+                    "\n¿Desea continuar?";
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, mensajeAlerta, ButtonType.YES, ButtonType.CANCEL);
+            // Shows the dialog but does not wait for a user response (in other words, this brings up a non-blocking dialog).
+            // Se tilda antes de llegar a mostrarse a veces jaja
+            // alert.show();
+            alert.showAndWait();
+//            alertResponse = alert.getResult();
+            if (alert.getResult() == ButtonType.CANCEL) {
+                ArrayList<String> listaEspera = new ArrayList<>();
+//                listaEspera.add("");
+                ObservableList oblistEspera = FXCollections.observableArrayList(listaEspera);
+                lvwListaResultados.setItems(oblistEspera);
+                return;
+            }
 
-        Regiones regiones = new Regiones(lblOrigenDatosRuta.getText());
-        oblist = FXCollections.observableArrayList(regiones.getDistritos());
-        cboDistritos.setItems(oblist);
+            oblist = FXCollections.observableArrayList(regiones.getDistritos());
+            cboDistritos.setItems(oblist);
 
-        resultados = new Resultados(lblOrigenDatosRuta.getText(), regiones.getPais());
-        oblist = FXCollections.observableArrayList(resultados.getResultadosRegion("00"));
-        lvwListaResultados.setItems(oblist);
-        cboDistritos.setDisable(false);
+            resultados = new Resultados(lblOrigenDatosRuta.getText(), regiones.getPais());
+            oblist = FXCollections.observableArrayList(resultados.getResultadosRegion("00"));
+            lvwListaResultados.setItems(oblist);
+            cboDistritos.setDisable(false);
+        } catch (FileNotFoundException e) {
+            ArrayList<String> listaEspera = new ArrayList<>();
+            listaEspera.add("No se pudieron leer los archivos.");
+            listaEspera.add("Asegúrese de haber seleccionado correctamente el directorio.");
+            ObservableList oblistEspera = FXCollections.observableArrayList(listaEspera);
+            lvwListaResultados.setItems(oblistEspera);
+            Alert alert = new Alert(Alert.AlertType.ERROR, "No se pudieron leer los archivos.\nAsegúrese de haber seleccionado correctamente el directorio.", ButtonType.OK);
+            alert.showAndWait();
+            cboDistritos.setDisable(true);
+//            Optional<Optional> result = alert.showAndWait();
+//            if (result.isPresent() && result.get() == ButtonType.OK) {
+//                formatSystem();
+//            }
+        }
         cboCircuitos.setDisable(true);
         cboSecciones.setDisable(true);
         cboMesas.setDisable(true);
@@ -71,7 +113,7 @@ public class PrincipalController {
     //TODO corregir validacion para circuitos cuando se reutiliza secciones/circuitos/etc
     public void elegirSeccion(ActionEvent actionEvent) {
         ObservableList oblist;
-        if (cboSecciones.getValue() !=null) {
+        if (cboSecciones.getValue() != null) {
             Region seccion = (Region) cboSecciones.getValue();
             oblist = FXCollections.observableArrayList(seccion.getSubregiones());
             cboCircuitos.setItems(oblist);
@@ -89,9 +131,9 @@ public class PrincipalController {
 
     public void elegirCircuito(ActionEvent actionEvent) {
         ObservableList oblist;
-        if (cboCircuitos.getValue() !=null) {
+        if (cboCircuitos.getValue() != null) {
             Region circuito = (Region) cboCircuitos.getValue();
-            oblist= FXCollections.observableArrayList(circuito.getSubregiones());
+            oblist = FXCollections.observableArrayList(circuito.getSubregiones());
             cboMesas.setItems(oblist);
             cboMesas.setDisable(false);
 
@@ -103,7 +145,7 @@ public class PrincipalController {
 
     public void elegirMesas(ActionEvent actionEvent) {
         ObservableList oblist;
-        if (cboMesas.getValue() !=null) {
+        if (cboMesas.getValue() != null) {
             Region mesa = (Region) cboMesas.getValue();
 
             oblist = FXCollections.observableArrayList(resultados.getResultadosRegion(mesa.getCodigo()));

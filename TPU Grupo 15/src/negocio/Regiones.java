@@ -2,13 +2,15 @@ package negocio;
 
 import soporte.ArchivoDeDatos;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 
 public class Regiones {
     private ArchivoDeDatos archivoRegiones;
     private Region pais;
 
-    public Regiones(String path) {
+    public Regiones(String path) throws FileNotFoundException
+    {
         archivoRegiones = new ArchivoDeDatos(path + "\\descripcion_regiones.dsv");
         //archivoMesas = new ArchivoDeDatos(path + "\\mesas_totales_agrp_politica.dsv");
         pais = archivoRegiones.identificarRegiones();
