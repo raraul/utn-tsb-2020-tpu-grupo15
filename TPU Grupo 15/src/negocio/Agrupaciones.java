@@ -10,6 +10,7 @@ public class Agrupaciones {
     private static TSB_OAHashtable tablaHashInicial;
     private TSB_OAHashtable tablaHashConteo;
 
+    // Qué es esto ?? Por qué duplicar una tabla hash, recreando una a una las agrupaciones??
     public Agrupaciones() {
         tablaHashConteo = new TSB_OAHashtable();
         for (Object o : tablaHashInicial.values()) {

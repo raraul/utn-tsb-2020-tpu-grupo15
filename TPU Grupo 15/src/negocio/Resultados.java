@@ -24,7 +24,7 @@ public class Resultados {
     }
 
     public void sumarVotos(String codRegion, String codAgrupacion, int votos) {
-        if(tablaHash.get(codRegion)==null) tablaHash.put(codRegion,new Agrupaciones());
+        if(tablaHash.get(codRegion)==null) tablaHash.put(codRegion, new Agrupaciones());
 
         Agrupaciones a = (Agrupaciones) tablaHash.get(codRegion);
         a.getAgrupacion(codAgrupacion).sumarVotos(votos);
