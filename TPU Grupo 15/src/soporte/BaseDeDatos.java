@@ -1,37 +1,31 @@
 package soporte;
 
+import java.io.File;
 import java.sql.*;
 
 public final class BaseDeDatos {
     public static String dbFilePath = "tpu.db";
 
-//    private  BaseDeDatos() {
-//    }
-//
-//    public static boolean existeArchivoDB() {
-//        return true;
-//    }
+    private BaseDeDatos() {
+    }
 
     public static void main(String[] args) {
-//        Connection c;
-//
-//        try {
-//            Class.forName("org.sqlite.JDBC");
-//            c = DriverManager.getConnection("jdbc:sqlite:" + dbFilePath);
-//        } catch (Exception e) {
-//            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-//            System.exit(0);
-//        }
-//        System.out.println("Opened database successfully");
-
-        eliminarTodasLasTablas();
+        if (existeArchivoDB()) {
+            eliminarTodasLasTablas();
+        }
         crearBaseDeDatos();
+    }
 
+    public static boolean existeArchivoDB() {
+        File tmpDir = new File(dbFilePath);
+        return tmpDir.exists();
     }
 
     public static void eliminarTodasLasTablas() {
         // Sería más fácil simplemente eliminar el archivo "tpu.sqlite"
-        // dado que queremos remover todas las tablas de la DB
+        // dado que queremos remover todas las tablas de la DB.
+        // Por las dudas solo limpiamos las tablas que vamos a utilizar,
+        // así de haber más contenido, éste no se perderá
         try {
             String[] tablas = {
                     "Distritos",
