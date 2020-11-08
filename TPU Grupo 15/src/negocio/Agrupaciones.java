@@ -23,6 +23,11 @@ public class Agrupaciones {
         tablaHashInicial = archivoAgrupaciones.identificarAgrupacion();
     }
 
+    public static void leerAgrupaciones()
+    {
+//        tablaHashInicial = lectorDB.identificarAgrupacion();
+    }
+
     public Agrupacion getAgrupacion(String codAgrupacion)
     {
         return (Agrupacion) tablaHashConteo.get(codAgrupacion);

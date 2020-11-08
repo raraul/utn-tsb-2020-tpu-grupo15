@@ -29,10 +29,9 @@ public class Resultados {
             return a.getResultados();
         }
         catch (NullPointerException ex) {
-            // todo: esto hay que arreglarlo para el caso de Malvinas
+            // esto hubo que arreglarlo para el caso de Malvinas
             System.out.println("NullPointerException");
             ex.printStackTrace();
-            // todo
             ArrayList<String> listaVacia = new ArrayList<>();
 //            listaVacia.add("Las Malvinas son argentinas.");
             listaVacia.add("No se registraron votos.");
