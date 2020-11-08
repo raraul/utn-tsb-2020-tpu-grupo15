@@ -4,6 +4,7 @@ import soporte.ArchivoDeDatos;
 import soporte.BaseDeDatos;
 import soporte.TSB_OAHashtable;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +18,7 @@ public class Resultados {
         archivoMesas.contarVotosPorRegion(this, pais);
     }
 
-    public Resultados(Region pais) {
+    public Resultados(Region pais) throws SQLException, ClassNotFoundException {
         tablaHash = new TSB_OAHashtable();
         BaseDeDatos.contarVotosPorRegion(this, pais);
     }
