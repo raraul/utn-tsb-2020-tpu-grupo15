@@ -33,7 +33,7 @@ public final class BaseDeDatos {
                     "Circuitos",
                     "Mesas",
                     "Agrupaciones",
-                    "Votos",
+                    "VotosPresidente",
             };
             for (String tabla : tablas) {
                 ejecutarInstruccionSql("DROP TABLE IF EXISTS " + tabla);
@@ -76,7 +76,7 @@ public final class BaseDeDatos {
                         " codigo TEXT NOT NULL UNIQUE," +
                         " nombre TEXT NOT NULL" +
                         ");",
-                "CREATE TABLE Votos (" +
+                "CREATE TABLE VotosPresidente (" +
                         " mesa INTEGER NOT NULL UNIQUE," +
                         " agrupacion INTEGER NOT NULL UNIQUE," +
                         " votos INTEGER NOT NULL," +
