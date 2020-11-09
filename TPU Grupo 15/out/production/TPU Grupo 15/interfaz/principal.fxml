@@ -17,6 +17,6 @@
       <ComboBox fx:id="cboCircuitos" disable="true" layoutX="443.0" layoutY="45.0" onAction="#elegirCircuito" prefHeight="25.0" prefWidth="216.0" promptText="------- Elija un circuito -------" />
       <ListView fx:id="lvwListaResultados" layoutX="14.0" layoutY="107.0" prefHeight="329.0" prefWidth="645.0" />
       <ComboBox fx:id="cboMesas" disable="true" layoutX="443.0" layoutY="76.0" onAction="#elegirMesas" prefHeight="25.0" prefWidth="216.0" promptText="------- Elija una mesa -------" />
-      <Button fx:id="btnGuardarEnDb" disable="true" layoutX="568.0" layoutY="444.0" mnemonicParsing="false" onAction="#guardarEnDb" text="Guardar en DB" />
+      <Button fx:id="btnGuardarEnDb" disable="true" layoutX="568.0" layoutY="444.0" mnemonicParsing="false" onAction="#guardarEnDb" text="Guardar en DB" visible="false" />
    </children>
 </AnchorPane>

@@ -33,15 +33,15 @@ public class PrincipalController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (BaseDeDatos.existeArchivoDB()) {
-            String mensajeAlerta = "Se ha detectado un archivo de base de datos.\n¿Desea cargarlo?";
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, mensajeAlerta, ButtonType.YES, ButtonType.NO);
-            alert.setTitle("¿Cargar archivo DB?");
-            alert.showAndWait();
-            if (alert.getResult() == ButtonType.CANCEL) {
-                usarDb = true;
-            }
-        }
+//        if (BaseDeDatos.existeArchivoDB()) {
+//            String mensajeAlerta = "Se ha detectado un archivo de base de datos.\n¿Desea cargarlo?";
+//            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, mensajeAlerta, ButtonType.YES, ButtonType.NO);
+//            alert.setTitle("¿Cargar archivo DB?");
+//            alert.showAndWait();
+//            if (alert.getResult() == ButtonType.CANCEL) {
+//                usarDb = true;
+//            }
+//        }
     }
 
     public void cambiarUbicacion(ActionEvent actionEvent) {
@@ -192,15 +192,18 @@ public class PrincipalController implements Initializable {
         try {
             BaseDeDatos.eliminarTodasLasTablas();
             BaseDeDatos.crearBaseDeDatos();
-            BaseDeDatos.guardarRegiones(regiones.getPais());
-            BaseDeDatos.guardarVotos(resultados);
+            System.out.println("Mirá el archivo ahora.");
+//            BaseDeDatos.guardarRegiones(regiones.getPais());
+//            BaseDeDatos.guardarVotos(resultados);
         } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     "No se pudo guardar en la base de datos." +
                             "\nAsegúrese de que exista y esté correcto el archivo de soporte de la base de datos.",
                     ButtonType.OK);
             alert.setTitle("Error al guardar en DB");
             alert.showAndWait();
+            return;
         }
 
         // Informamos al usuario el guardado exitoso

@@ -53,7 +53,7 @@ public final class BaseDeDatos {
     public static void crearBaseDeDatos() throws SQLException, ClassNotFoundException
     {
         String[] tablas = {
-                "CREATE TABLE IF NOT EXISTS Distritos (" +
+                "CREATE TABLE Distritos (" +
                         " distrito_id INTEGER PRIMARY KEY," +
                         " codigo TEXT NOT NULL UNIQUE," +
                         " nombre TEXT NOT NULL" +
@@ -112,12 +112,13 @@ public final class BaseDeDatos {
     {
         Statement stmt;
         Connection c = obtenerConexionDb();
-        System.out.println("Conexión a la DB abierta.");
+//        System.out.println("Conexión a la DB abierta.");
+
         stmt = c.createStatement();
         stmt.executeUpdate(comandoSql);
         stmt.close();
         c.close();
-        System.out.println("Conexión a la DB cerrada.");
+//        System.out.println("Conexión a la DB cerrada.");
     }
 
     public static ResultSet ejecutarInstruccionQuery(String comandoSql) throws SQLException, ClassNotFoundException
@@ -129,13 +130,13 @@ public final class BaseDeDatos {
         Class.forName("org.sqlite.JDBC");
         c = DriverManager.getConnection("jdbc:sqlite:" + dbFilePath);
         c.setAutoCommit(false);
-        System.out.println("Conexión a la DB abierta.");
+//        System.out.println("Conexión a la DB abierta.");
 
         stmt = c.createStatement();
         rs = stmt.executeQuery(comandoSql);
         stmt.close();
         c.close();
-        System.out.println("Conexión a la DB cerrada.");
+//        System.out.println("Conexión a la DB cerrada.");
 
         return rs;
     }
@@ -289,7 +290,6 @@ public final class BaseDeDatos {
 
     public static void contarVotosPorRegion(Resultados resultados, Region pais) throws SQLException, ClassNotFoundException {
         int votos;
-        // String linea = "", campos[];
         Region distrito, seccion, circuito;
 
         ResultSet rs;
@@ -345,13 +345,125 @@ public final class BaseDeDatos {
         System.out.println("Conexión a la DB cerrada.");
     }
 
-    public static void guardarRegiones(Region pais) {
+    public static void guardarRegiones(Region pais) throws SQLException, ClassNotFoundException {
+        // Recorremos la lista de distritos
+        Connection c = obtenerConexionDb();
+        System.out.println("Conexión a la DB abierta.");
+        Statement stmt = null;
+        long idDistrito, idSeccion, idCircuito, idMesa, idAgrupacion;
+        String comandoSql;
+        PreparedStatement statement;
+        int affectedRows;
+
         for (Object distritoObj : pais.getSubregiones()) {
-            Region distrito = (Region) distritoObj;
-            distrito.getCodigo();
-            distrito.getNombre();
+
+//            stmt = c.createStatement();
+//            ResultSet rs;
+//            rs = stmt.executeQuery("");
+//            while ( rs.next() ) {
+//
+//            }
             
+            Region distrito = (Region) distritoObj;
+
+            comandoSql = "INSERT INTO Distritos (codigo, nombre) Values (?, ?)";
+            statement = c.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, distrito.getCodigo());
+            statement.setString(2, distrito.getNombre());
+            affectedRows = statement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    idDistrito = generatedKeys.getLong(1);
+                }
+                else {
+                    throw new SQLException("Insert failed, no ID obtained.");
+                }
+            }
+
+            for (Object seccionObj : distrito.getSubregiones()) {
+
+                Region seccion = (Region) seccionObj;
+
+                comandoSql = "INSERT INTO Secciones (codigo, nombre, distrito) Values (?, ?, ?)";
+                statement = c.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, seccion.getCodigo());
+                statement.setString(2, seccion.getNombre());
+                statement.setLong(3, idDistrito);
+                affectedRows = statement.executeUpdate();
+
+                if (affectedRows == 0) {
+                    throw new SQLException("Insert failed, no rows affected.");
+                }
+
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        idSeccion = generatedKeys.getLong(1);
+                    }
+                    else {
+                        throw new SQLException("Insert failed, no ID obtained.");
+                    }
+                }
+
+                for (Object circuitoObj : seccion.getSubregiones()) {
+
+                    Region circuito = (Region) circuitoObj;
+
+                    comandoSql = "INSERT INTO Circuitos (codigo, nombre, seccion) Values (?, ?, ?)";
+                    statement = c.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
+                    statement.setString(1, seccion.getCodigo());
+                    statement.setString(2, seccion.getNombre());
+                    statement.setLong(3, idSeccion);
+                    affectedRows = statement.executeUpdate();
+
+                    if (affectedRows == 0) {
+                        throw new SQLException("Insert failed, no rows affected.");
+                    }
+
+                    try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            idCircuito = generatedKeys.getLong(1);
+                        }
+                        else {
+                            throw new SQLException("Insert failed, no ID obtained.");
+                        }
+                    }
+
+                    for (Object mesaObj : circuito.getSubregiones()) {
+
+                        Region mesa = (Region) mesaObj;
+
+                        comandoSql = "INSERT INTO Mesas (codigo, circuito) Values (?, ?)";
+                        statement = c.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
+                        statement.setString(1, seccion.getCodigo());
+//                        statement.setString(2, seccion.getNombre());
+                        statement.setLong(2, idCircuito);
+                        affectedRows = statement.executeUpdate();
+
+                        if (affectedRows == 0) {
+                            throw new SQLException("Insert failed, no rows affected.");
+                        }
+
+                        try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                idMesa = generatedKeys.getLong(1);
+                            }
+                            else {
+                                throw new SQLException("Insert failed, no ID obtained.");
+                            }
+                        }
+                    }
+                }
+            }
+
         }
+        stmt.close();
+        System.out.println("Conexión a la DB cerrada.");
+        c.close();
     }
 
     public static void guardarVotos(Resultados resultados) {
