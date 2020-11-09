@@ -346,7 +346,12 @@ public final class BaseDeDatos {
     }
 
     public static void guardarRegiones(Region pais) {
-
+        for (Object distritoObj : pais.getSubregiones()) {
+            Region distrito = (Region) distritoObj;
+            distrito.getCodigo();
+            distrito.getNombre();
+            
+        }
     }
 
     public static void guardarVotos(Resultados resultados) {
