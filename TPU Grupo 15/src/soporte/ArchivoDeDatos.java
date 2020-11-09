@@ -104,7 +104,7 @@ public class ArchivoDeDatos {
                     for (int i = 0; i < 4; i++) {
                         resultados.sumarVotos(campos[i], campos[5], votos);
                     }
-                    //Para mostrar las mesas
+                    // Para mostrar las mesas
                     distrito = pais.getSubregion(campos[0]);
                     seccion = distrito.getSubregion(campos[1]);
                     circuito = seccion.getSubregion(campos[2]);

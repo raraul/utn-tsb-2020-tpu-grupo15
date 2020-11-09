@@ -29,6 +29,7 @@ public class PrincipalController implements Initializable {
     public Resultados resultados;
     public boolean usarDb = false;
     public Button btnGuardarEnDb;
+    public Regiones regiones;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -91,7 +92,6 @@ public class PrincipalController implements Initializable {
 
         ObservableList oblist;
         try {
-            Regiones regiones;
             if (usarDb) {
                 Agrupaciones.leerAgrupaciones();
                 regiones = new Regiones();
@@ -188,7 +188,20 @@ public class PrincipalController implements Initializable {
 
 
     public void guardarEnDb(ActionEvent actionEvent) {
-        // todo
+
+        try {
+            BaseDeDatos.eliminarTodasLasTablas();
+            BaseDeDatos.crearBaseDeDatos();
+            BaseDeDatos.guardarRegiones(regiones.getPais());
+            BaseDeDatos.guardarVotos(resultados);
+        } catch (SQLException | ClassNotFoundException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "No se pudo guardar en la base de datos." +
+                            "\nAsegúrese de que exista y esté correcto el archivo de soporte de la base de datos.",
+                    ButtonType.OK);
+            alert.setTitle("Error al guardar en DB");
+            alert.showAndWait();
+        }
 
         // Informamos al usuario el guardado exitoso
         String mensajeAlerta = "Se han guardado exitosamente los datos en la base de datos.";
@@ -198,5 +211,6 @@ public class PrincipalController implements Initializable {
 
         // Se acaba de hacer el guardado, deshabilitamos el botón
         btnGuardarEnDb.setDisable(true);
+
     }
 }

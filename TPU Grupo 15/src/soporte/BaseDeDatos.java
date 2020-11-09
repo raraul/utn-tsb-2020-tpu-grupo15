@@ -2,6 +2,7 @@ package soporte;
 
 import negocio.Agrupacion;
 import negocio.Region;
+import negocio.Regiones;
 import negocio.Resultados;
 
 import java.io.File;
@@ -342,5 +343,13 @@ public final class BaseDeDatos {
         stmt.close();
         c.close();
         System.out.println("Conexión a la DB cerrada.");
+    }
+
+    public static void guardarRegiones(Region pais) {
+
+    }
+
+    public static void guardarVotos(Resultados resultados) {
+
     }
 }

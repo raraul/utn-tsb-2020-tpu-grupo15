@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="450.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.PrincipalController">
+<AnchorPane prefHeight="483.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaz.PrincipalController">
    <children>
       <Button fx:id="btnSeleccionarOrigenDatos" layoutX="572.0" layoutY="12.0" mnemonicParsing="false" onAction="#cambiarUbicacion" prefHeight="25.0" prefWidth="86.0" text="Seleccionar" />
       <Label fx:id="lblOrigenDatos" layoutX="14.0" layoutY="10.0" prefHeight="25.0" prefWidth="89.0" text="Origen de datos:" />
@@ -17,5 +17,6 @@
       <ComboBox fx:id="cboCircuitos" disable="true" layoutX="443.0" layoutY="45.0" onAction="#elegirCircuito" prefHeight="25.0" prefWidth="216.0" promptText="------- Elija un circuito -------" />
       <ListView fx:id="lvwListaResultados" layoutX="14.0" layoutY="107.0" prefHeight="329.0" prefWidth="645.0" />
       <ComboBox fx:id="cboMesas" disable="true" layoutX="443.0" layoutY="76.0" onAction="#elegirMesas" prefHeight="25.0" prefWidth="216.0" promptText="------- Elija una mesa -------" />
+      <Button fx:id="btnGuardarEnDb" disable="true" layoutX="568.0" layoutY="444.0" mnemonicParsing="false" onAction="#guardarEnDb" text="Guardar en DB" />
    </children>
 </AnchorPane>
